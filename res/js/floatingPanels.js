@@ -226,9 +226,47 @@ TheShodo.Shodo.Write.PanelFinish = function () {
             }
         }
     ];
+
+    this.buttons.push(
+        {
+            label: 'ShodoTen',
+            className: 'share-button shodoten',
+            onClick: function () {
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://shodoten.com/share?url=${url}`, "_blank");
+            }
+        },
+        {
+            label: 'Instagram',
+            className: 'share-button instagram',
+            onClick: function () {
+                alert("Instagram does not support direct sharing. Please upload your image manually.");
+                window.open(`https://www.instagram.com`, "_blank");
+            }
+        },
+        {
+            label: 'X (Twitter)',
+            className: 'share-button twitter',
+            onClick: function () {
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://twitter.com/intent/tweet?text=Check out my calligraphy!&url=${url}`, "_blank");
+            }
+        },
+        {
+            label: 'NFC Platform',
+            className: 'share-button nfc',
+            onClick: function () {
+                alert("Redirecting to NFC selling platform...");
+                window.location.href = "https://nfc-platform.com/sell";
+            }
+        }
+    );
+
+
     this.comment = '';
     this.hasButtons = true;
     this.cancelOnEscKey = false;
+    
 }
 TheShodo.Shodo.Write.PanelFinish.prototype = new TheShodo.FloatingPanel(TheShodo.Shodo.Resources.Write.String.Panel_Finish_Title || "Save your work");
 TheShodo.Shodo.Write.PanelFinish.prototype.updateTenkoku = function (tenkoku) {

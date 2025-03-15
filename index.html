@@ -20,6 +20,8 @@
 	<script src="res/js/TheShodo.Shodo.Write.js"></script>
 	<script src="res/js/kazari.js"></script>
 	<script src="res/js/floatingPanels.js"></script>
+	<script src="res/js/shareButton.js"></script>
+
 
 
 	<script>
@@ -37,6 +39,7 @@
 </header>
 
 <article class="content">
+	
 
 <div class="write-stage">
 <div class="write-container">
@@ -350,6 +353,9 @@
 <img id="write-fude-small" src="res/img/fude_L.png"><img id="write-fude-medium" src="res/img/fude_M.png"><img id="write-fude-large" src="res/img/fude_B.png">
 <!-- /write-tools-stage --></a>
 
+<label for="colorPicker">Brush Color:</label>
+<input type="color" id="colorPicker" value="#000000">
+
 <a id="hand-visibility-checkbox" class="checked">show hand holding brush</a>
 
 <!-- /write-tools --></div>
@@ -358,8 +364,10 @@
 <!-- /write-stage --></div>
 
 <menu type="list" id="top-menu">
+<li class="menu-undo"><a id="button-undo">Undo</a></li> <!-- New Undo button -->
 <li class="menu-clear"><a id="button-clear">Clear</a></li>
 <li class="menu-finish"><a id="button-finish">Finish</a></li>
+
 
 <!-- <li class="menu-paper menu-folding"><a id="button-paper">Paper</a>
 <div class="submenu">
@@ -432,6 +440,7 @@
 </script>
 
 
+
 <script type="text/html" id="floating-panel-content-finish">
 <div class="finish-form">
 <form action="/Write/Commit" method="post"><div class="panel-left">
@@ -446,6 +455,7 @@
 <input class="tenkoku-input" name="Tenkoku" type="text" value="" maxlength="10" placeholder="JOHN SMITH" autofocus="autofocus" /><br />
 <small>only letters (a-z), numbers (0-9), and Hyphen (-)</small>
 </label>
+</div>
 </div>
 
 <!-- <div>
@@ -477,12 +487,20 @@
 <div class="floating-panel-close"><a href="#">Close</a></div>
 <div class="floating-panel-body">
 <div class="floating-panel-body-content"></div>
-<div class="floating-panel-buttons" style="display: block;">
+<div class="floating-panel-buttons" style="display: block;">	
 </div>
 </div>
 </div>
 </div>
 <!-- /floating panel -->
+<!-- Social Media Share Buttons -->
+<div class="panel-share">
+	<p>Share your work on:</p>
+	<a href="#" class="share-button shodoten">ShodoTen</a>
+	<a href="#" class="share-button instagram">Instagram</a>
+	<a href="#" class="share-button twitter">X</a>
+	<a href="#" class="share-button nfc">NFC Platform</a>
+</div>	
 
 <iframe src="res/media/silence.mp3" allow="autoplay" id="audio" style="display:none"></iframe>
 <audio class="bgm" loop>

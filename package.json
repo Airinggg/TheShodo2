@@ -4,6 +4,7 @@
   "description": "",
   "main": "",
   "scripts": {
+    "start": "gulp",
     "lint": "eslint --fix-dry-run --ignore-pattern *.min.js ."
   },
   "repository": {
@@ -14,11 +15,12 @@
   "license": "MIT",
   "homepage": "https://github.com/cobysy",
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^5.0.0",
     "gulp-clean": "^0.4.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
-    "gulp-minify-css": "^1.2.4",
-    "gulp-uglify": "^3.0.1",
+    "gulp-plumber": "^1.2.1",
+    "gulp-uglify": "^3.0.2",
     "merge-stream": "^1.0.1"
   }
 }

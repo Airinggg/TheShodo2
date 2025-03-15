@@ -111,6 +111,35 @@ TheShodo.Shodo.StrokeManager.prototype.clearHistory = function() {
     return this;
 }
 
+TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
+    /// <summary>Undo the last stroke by making it invisible instead of redrawing</summary>
+    if (this.isLocked) return;  // Prevent undo if locked
+    if (this.strokeHistory.length === 0) return;  // No strokes to undo
+
+    let lastStroke = this.strokeHistory.pop(); // Get the last stroke
+    
+    // Optionally log the stroke to verify it's being popped
+    console.log("Undoing stroke:", lastStroke);
+
+    // Handle the undo operation based on the stroke type
+    if (lastStroke.O === TheShodo.Shodo.StrokeManager.StrokeOperation.Stroke) {
+        // Make stroke invisible instead of clearing the entire history
+        for (let point of lastStroke.D) {
+            // Set pressure to 0 to "hide" it
+            point.p = 0;  // Modify the pressure directly in the history data
+        }
+
+        // Push the updated stroke back into the history
+        this.strokeHistory.push(lastStroke);  // You may need to replace the history with the modified stroke
+        
+        this.strokeEngine.endStroke(); // Finalize the action
+    }
+
+    console.log("Stroke history after undo:", this.strokeHistory);
+};
+
+
+
 TheShodo.Shodo.StrokeManager.prototype.beginStroke = function() {
     /// <summary>Begin state of one stroke</summary>
     /// <return>TheShodo.Shodo.StrokeManager</return>
@@ -160,145 +189,97 @@ TheShodo.Shodo.StrokeManager.prototype.endStroke = function() {
     return this;
 }
 
-TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
-    /// <summary>Undo Stroke</summary>
-    /// <return>TheShodo.Shodo.StrokeManager</return>
-    if (this.isLocked) return;
-
-    throw "NotSupported";
-
-    // this.strokeEngine.endStroke();
-    // this.strokeHistory.pop();
-    // this.currentStroke = null;
-    // this.strokeEngine.undoStroke();
-
-    // return this;
-}
 
 TheShodo.Shodo.StrokeManager.prototype.start = function() {
-    /// <summary></summary>
-    /// <return>TheShodo.Shodo.StrokeManager</return>
-    var handCanvasObject = $(this.eventCaptureTarget);
-    var handCanvas = handCanvasObject.get(0);
-    $('body .content')
-        .live('mousemove', function(e) {
-            handCanvasObject.trigger('mouseup', e);
-        });
-
     var self = this;
     var isMouseDown = false;
 
+    var handCanvasObject = $(this.eventCaptureTarget);
+    var handCanvas = handCanvasObject.get(0);
     var handE = $(this.handElementSelector);
     var offset = handCanvasObject.offset();
 
-    if (window.navigator.msPointerEnabled) {
-        handCanvasObject[0].addEventListener('MSPointerDown', function(e) {
-            if (!e.isPrimary) return;
-
+    // Prevents unwanted scrolling & zooming
+    handCanvas.style.touchAction = "none"; 
+    document.body.style.touchAction = "none";
+    
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.closest("#canvas")) {
             e.preventDefault();
-            isMouseDown = true;
-
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
-            handE.css('top', y);
-            handE.css('left', x);
-
-            if (self.isHandVisible)
-                handE.fadeIn('fast');
-
-            self.beginStroke();
-        }, false);
-        handCanvasObject[0].addEventListener('MSPointerMove', function(e) {
-            if (!e.isPrimary) return;
-            if (!isMouseDown) return;
-
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
-
-            if (e.pressure == 0 && e.pointerType == 0x00000003 /* MSPOINTER_TYPE_PEN */ ) return;
-
-            self.addStrokePosition(x, y, e.pressure);
-
-            handE.css('top', y);
-            handE.css('left', x);
-        }, false);
-        handCanvasObject[0].addEventListener('MSPointerUp', function(e) {
-            if (!e.isPrimary) return;
-
-            e.preventDefault();
-            if (!isMouseDown) return;
-            isMouseDown = false;
-
-            self.endStroke();
-
-            if (self.isHandVisible)
-                handE.fadeOut('fast');
-        }, false);
-    } else {
-        function onStart(e){
-            console.log('onStart')
-            e.preventDefault();
-            isMouseDown = true;
-
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
-            handE.css('top', y);
-            handE.css('left', x);
-
-            if (self.isHandVisible)
-                handE.fadeIn('fast');
-
-            self.beginStroke();
         }
-        function onDraw(e){
-            console.log('onDraw',e.touches)
-            e.preventDefault();
-            e.stopPropagation(),e.touches && (e = e.touches[0]);
-            if (!isMouseDown) return;
+    }, { passive: false });
+    
 
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
-
-            console.log(x,y)
-
-            self.addStrokePosition(x, y);
-
-            handE.css('top', y);
-            handE.css('left', x);
-        }
-        function onEnd(e){
-            console.log('onEnd')
-            e.preventDefault();
-            if (!isMouseDown) return;
-            isMouseDown = false;
-
-            var x = e.pageX - offset.left;
-            var y = e.pageY - offset.top;
-
-            self.endStroke();
-
-            if (self.isHandVisible)
-                handE.fadeOut('fast');
-        }
-
-         function isSupportTouch(){
-            var touchObj={};
-            touchObj.isSupportTouch = "ontouchend" in document ? true : false;
-            touchObj.isEvent=touchObj.isSupportTouch?'touchstart':'click';
-            return touchObj.isEvent;
-        }
-        handCanvasObject
-            .on('mousedown', onStart)
-            .on('mousemove', onDraw)
-            .on('mouseup', onEnd);
-
-        if(isSupportTouch()){
-            handCanvasObject[0].addEventListener('touchstart',onStart,false);
-            handCanvasObject[0].addEventListener('touchmove',onDraw,false);
-            handCanvasObject[0].addEventListener('touchend',onEnd,false);
-        }
+    function getEventCoordinates(e) {
+        let touch = e.touches ? e.touches[0] : e;
+        let offset = handCanvasObject.offset(); // Recalculate offset dynamically
+        return {
+            x: touch.clientX - offset.left,
+            y: touch.clientY - offset.top
+        };
     }
-}
+
+    function onStart(e) {
+        console.log("onStart");
+        e.preventDefault();
+        isMouseDown = true;
+
+        let { x, y } = getEventCoordinates(e);
+        handE.css({ top: y, left: x });
+
+        if (self.isHandVisible) handE.fadeIn("fast");
+
+        self.beginStroke();
+    }
+
+    function onDraw(e) {
+        console.log("onDraw", e.touches);
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isMouseDown) return;
+
+        // Ignore stylus movement when pressure is 0
+        if ((e.pointerType === "pen" || e.pointerType === "touch") && e.pressure === 0) return;
+
+        let { x, y } = getEventCoordinates(e);
+        console.log(x, y);
+
+        self.addStrokePosition(x, y);
+        handE.css({ top: y, left: x });
+    }
+
+    function onEnd(e) {
+        console.log("onEnd");
+        e.preventDefault();
+        if (!isMouseDown) return;
+        isMouseDown = false;
+
+        
+        let touch = e.changedTouches ? e.changedTouches[0] : e;
+        let offset = handCanvasObject.offset();
+        let x = touch.clientX - offset.left;
+        let y = touch.clientY - offset.top;
+
+        self.endStroke();
+        if (self.isHandVisible) handE.fadeOut("fast");
+    }
+
+    // Mouse Events
+    handCanvasObject.on("mousedown", onStart)
+        .on("mousemove", onDraw)
+        .on("mouseup", onEnd);
+
+    // Touch Events (with passive false to prevent scrolling issues)
+    handCanvasObject[0].addEventListener("touchstart", onStart, { passive: false });
+    handCanvasObject[0].addEventListener("touchmove", onDraw, { passive: false });
+    handCanvasObject[0].addEventListener("touchend", onEnd, { passive: false });
+
+    // Pointer Events (for stylus & modern browsers)
+    handCanvasObject[0].addEventListener("pointerdown", onStart, false);
+    handCanvasObject[0].addEventListener("pointermove", onDraw, false);
+    handCanvasObject[0].addEventListener("pointerup", onEnd, false);
+};
+
 
 // ----------------------------------------------------------------------------
 
@@ -351,7 +332,18 @@ TheShodo.Shodo.StrokeEngine.prototype.clear = function() {
     //this.compositedCanvasContext.fillRect(0, 0, this.width, this.height);
     this.compositedCanvasContext.clearRect(0, 0, this.width, this.height);
     this.compositedCanvasContext.restore();
+
+     // Reset stroke-related buffers
+     this.strokeBuffer = [];
+     this.splineBuffer = [];
+     this.previousPosition = null;
+     this.previousBrushSize = null;
+     this.previousVelocity = 0;
+     this.previousDistance = 0;
+     this.expectedNextPosition = null;
+     this.accelerate = 0;
 }
+
 
 TheShodo.Shodo.StrokeEngine.prototype.createColoredBrushImage = function(originalBrushImage, brushColor, width, height) {
     var tmpCanvas = document.createElement('canvas');
@@ -426,7 +418,7 @@ TheShodo.Shodo.StrokeEngine.prototype.compositeCanvas = function() {
     tmpCanvas.height = this.height;
     // WORKAROUND: IE9
     tmpCanvas.getContext('2d').fillRect(0, 0, 0, 0);
-    this.canvas.get(0).getContext('2d').fillRect(0, 0, 0, 0);
+    this.canvas.get(0).getContext('2d').clearRect(0, 0, 0, 0);
 
     // writeCanvas -(w/alpha)-> tmpCanvas
     var tmpCtx = tmpCanvas.getContext('2d');
@@ -443,7 +435,7 @@ TheShodo.Shodo.StrokeEngine.prototype.setBrushOpacity = function(brushOpacity) {
     // set new opacity
     this.brushOpacity = brushOpacity;
     //this.createBrushWithOpacity(this.currentBrush.name, brushOpacity);
-    this.canvas.css('opacity', this.brushOpacity);
+    this.canvas[0].style.opacity = this.brushOpacity;
 }
 
 TheShodo.Shodo.StrokeEngine.prototype.getBrushOpacity = function() {
@@ -636,6 +628,7 @@ TheShodo.Shodo.StrokeEngine.prototype.drawStroke = function(ctx, startPos, endPo
     var t = 0;
     var brushDelta = (brushSize - this.previousBrushSize);
 
+    if (distance === 0) return; // Prevent infinite loop
     while (t < 1) {
         var brushSizeCur = Math.min(this.previousBrushSize + (brushDelta * t), this.currentBrush.maxSize);
         var pos = this.getInterlatePos(startPos, endPos, t);
@@ -647,7 +640,7 @@ TheShodo.Shodo.StrokeEngine.prototype.drawStroke = function(ctx, startPos, endPo
             ctx.drawImage(this.currentBrush.kasureImage, px, py, brushSizeCur, brushSizeCur);
             //console.log('drawImage: brushSize=%d, startPos.p=%d, endPos.p=%d, %d, %d, %d, %d', brushSize, startPos.p, endPos.p, px, py, brushSizeCur, brushSizeCur);
         }
-        t += 1 / distance;
+        t += 1 / Math.max(1, distance); // Ensure no zero division
     }
 }
 
