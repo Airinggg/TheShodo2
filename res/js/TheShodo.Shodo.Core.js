@@ -24,7 +24,7 @@ TheShodo.Shodo.StrokeManager.StrokeOperation = {
     Stroke: 0,
     SetOpacity: 1,
     SetBrush: 2,
-    SetColor: 3
+    SetColor: 32
 }
 
 TheShodo.Shodo.StrokeManager.prototype.lock = function() {
@@ -111,32 +111,37 @@ TheShodo.Shodo.StrokeManager.prototype.clearHistory = function() {
     return this;
 }
 
-TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
-    /// <summary>Undo the last stroke by making it invisible instead of redrawing</summary>
-    if (this.isLocked) return;  // Prevent undo if locked
-    if (this.strokeHistory.length === 0) return;  // No strokes to undo
+//TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
+    //if (this.isLocked) return;
+    //if (!this.strokeHistory || this.strokeHistory.length === 0) {
+        //console.warn("No strokes to undo.");
+        //return;
+    //}
 
-    let lastStroke = this.strokeHistory.pop(); // Get the last stroke
-    
-    // Optionally log the stroke to verify it's being popped
-    console.log("Undoing stroke:", lastStroke);
+    //if (!this.redoStack) this.redoStack = []; // Ensure redoStack exists
 
-    // Handle the undo operation based on the stroke type
-    if (lastStroke.O === TheShodo.Shodo.StrokeManager.StrokeOperation.Stroke) {
-        // Make stroke invisible instead of clearing the entire history
-        for (let point of lastStroke.D) {
-            // Set pressure to 0 to "hide" it
-            point.p = 0;  // Modify the pressure directly in the history data
-        }
+    //let lastStroke = this.strokeHistory.pop(); // Remove last stroke
+    //this.redoStack.push(lastStroke);  // Save for redo
 
-        // Push the updated stroke back into the history
-        this.strokeHistory.push(lastStroke);  // You may need to replace the history with the modified stroke
-        
-        this.strokeEngine.endStroke(); // Finalize the action
-    }
+    //console.log("Undoing stroke:", lastStroke);
+    //console.log("Stroke history after undo:", this.strokeHistory);
 
-    console.log("Stroke history after undo:", this.strokeHistory);
-};
+    // Instead of clearing the canvas, we force a re-render
+    //this.strokeEngine.clear(); // Clear only visible strokes, not history
+
+    // **Redraw all remaining strokes**
+    //for (let stroke of this.strokeHistory) {
+        //if (stroke.O === TheShodo.Shodo.StrokeManager.StrokeOperation.Stroke) {
+            //this.strokeEngine.beginStroke();
+            //for (let point of stroke.D) {
+                //this.strokeEngine.addStrokePosition(point.X, point.Y, point.P);
+            //}
+            //this.strokeEngine.endStroke();
+        //}
+    //}
+
+    //console.log("Redraw complete.");
+//};
 
 
 
