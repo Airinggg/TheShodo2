@@ -320,8 +320,6 @@ TheShodo.Shodo.Write.attachButtonEvents = function () {
     $('#button-clear').click(TheShodo.Shodo.Write.onClearButtonClicked);
     // [Finish]
     $('#button-finish').click(TheShodo.Shodo.Write.onFinishButtonClicked);
-    // [Undo]
-    $('#button-undo').click(TheShodo.Shodo.Write.onUndoButtonClicked);
 
     // [Copybook]
     $('#copybook-select a').click(TheShodo.Shodo.Write.onCopybookItemClicked);
@@ -464,11 +462,6 @@ TheShodo.Shodo.Write.onClearButtonClicked = function (e) {
     TheShodo.Shodo.Write.clear();
 }
 
-// On [Undo] (top-menu) clicked.
-TheShodo.Shodo.Write.onUndoButtonClicked = function (e) {
-    e.preventDefault();
-    TheShodo.Shodo.Shared.StrokeManager.undoStroke();
-};
 
 // On Click Clear in floating panel.
 TheShodo.Shodo.Write.onClear = function (e) {

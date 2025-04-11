@@ -233,7 +233,7 @@ TheShodo.Shodo.Write.PanelFinish = function () {
             className: 'share-button shodoten',
             onClick: function () {
                 const url = encodeURIComponent(window.location.href);
-                window.open(`https://shodoten.com/share?url=${url}`, "_blank");
+                window.open(`https://shodoten.kaku.com/share?url=${url}`, "_blank");
             }
         },
         {

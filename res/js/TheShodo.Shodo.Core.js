@@ -111,7 +111,7 @@ TheShodo.Shodo.StrokeManager.prototype.clearHistory = function() {
     return this;
 }
 
-//TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
+/*TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
     //if (this.isLocked) return;
     //if (!this.strokeHistory || this.strokeHistory.length === 0) {
         //console.warn("No strokes to undo.");
@@ -141,8 +141,8 @@ TheShodo.Shodo.StrokeManager.prototype.clearHistory = function() {
     //}
 
     //console.log("Redraw complete.");
-//};
-
+};
+*/
 
 
 TheShodo.Shodo.StrokeManager.prototype.beginStroke = function() {
