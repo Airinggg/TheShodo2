@@ -255,20 +255,10 @@ TheShodo.Shodo.Write.setBrushColor = function (color) {
 }
 
 TheShodo.Shodo.Write.clear = function () {
-    /// <summary>Show 'Clear' confirmation dialog</summary>
-    var floatingPanel = new TheShodo.FloatingPanel.MessageBox('',
-                                                              TheShodo.Shodo.Resources.Write.String.Panel_Clear_Label || 'Clear?',
-                                                              [
-                                                                  { label: TheShodo.Shodo.Resources.Write.String.Panel_Cancel || 'Cancel', isCancel: true, isDefault: true },
-                                                                  { label: TheShodo.Shodo.Resources.Write.String.Panel_Delete || 'Yes',
-                                                                    onClick: function (sender, e) {
-                                                                          TheShodo.Shodo.Write.onClear(sender);
-                                                                          sender.close();
-                                                                    }
-                                                                  },
-                                                              ]);
-    floatingPanel.show();
-}
+    ///clear directly
+    TheShodo.Shodo.Write.onClear(null);
+};
+
 
 TheShodo.Shodo.Write.selectPaper = function (paperName) {
     /// <summary>Set Paper</summary>

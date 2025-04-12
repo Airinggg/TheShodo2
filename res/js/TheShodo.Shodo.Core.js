@@ -111,38 +111,6 @@ TheShodo.Shodo.StrokeManager.prototype.clearHistory = function() {
     return this;
 }
 
-/*TheShodo.Shodo.StrokeManager.prototype.undoStroke = function() {
-    //if (this.isLocked) return;
-    //if (!this.strokeHistory || this.strokeHistory.length === 0) {
-        //console.warn("No strokes to undo.");
-        //return;
-    //}
-
-    //if (!this.redoStack) this.redoStack = []; // Ensure redoStack exists
-
-    //let lastStroke = this.strokeHistory.pop(); // Remove last stroke
-    //this.redoStack.push(lastStroke);  // Save for redo
-
-    //console.log("Undoing stroke:", lastStroke);
-    //console.log("Stroke history after undo:", this.strokeHistory);
-
-    // Instead of clearing the canvas, we force a re-render
-    //this.strokeEngine.clear(); // Clear only visible strokes, not history
-
-    // **Redraw all remaining strokes**
-    //for (let stroke of this.strokeHistory) {
-        //if (stroke.O === TheShodo.Shodo.StrokeManager.StrokeOperation.Stroke) {
-            //this.strokeEngine.beginStroke();
-            //for (let point of stroke.D) {
-                //this.strokeEngine.addStrokePosition(point.X, point.Y, point.P);
-            //}
-            //this.strokeEngine.endStroke();
-        //}
-    //}
-
-    //console.log("Redraw complete.");
-};
-*/
 
 
 TheShodo.Shodo.StrokeManager.prototype.beginStroke = function() {
